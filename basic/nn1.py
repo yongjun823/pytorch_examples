@@ -47,7 +47,7 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                           shuffle=False)
 
 net = Net(input_size, hidden_size, num_classes)
-# net.cuda()
+net.cuda()
 
 # Loss and Optimizer
 criterion = nn.CrossEntropyLoss()
@@ -56,8 +56,8 @@ optimizer = torch.optim.Adam(net.parameters(), lr=learning_rate)
 for epoch in range(num_epochs):
     for i, (images, labels) in enumerate(train_loader):
         # Convert torch tensor to Variable
-        images = Variable(images.view(-1, 28 * 28))
-        labels = Variable(labels)
+        images = Variable(images.view(-1, 28 * 28).cuda())
+        labels = Variable(labels.cuda())
 
         # Forward + Backward + Optimize
         optimizer.zero_grad()  # zero the gradient buffer
@@ -73,10 +73,10 @@ for epoch in range(num_epochs):
 correct = 0
 total = 0
 for images, labels in test_loader:
-    images = Variable(images.view(-1, 28 * 28))
+    images = Variable(images.view(-1, 28 * 28)).cuda()
     outputs = net(images)
     _, predicted = torch.max(outputs.data, 1)
     total += labels.size(0)
-    correct += (predicted == labels).sum()
+    correct += (predicted.cpu() == labels).sum()
 
 print('Accuracy of the network on the 10000 test images: %d %%' % (100 * correct / total))
