@@ -67,4 +67,4 @@ for images, labels in test_loader:
 print('Accuracy of the network on the 10000 test images: %d %%' % (100 * correct / total))
 
 # Save the Model
-torch.save(Dnn.state_dict(), 'model.pkl')
+torch.save(Dnn.state_dict(), 'model_dnn.pkl')
