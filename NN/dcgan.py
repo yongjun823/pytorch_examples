@@ -4,6 +4,7 @@ from torchvision import datasets
 from torchvision import transforms
 from torch.autograd import Variable
 from torchvision.utils import save_image
+import torch.nn.functional as F
 
 
 def to_var(x):
@@ -65,7 +66,7 @@ class Discriminator(nn.Module):
         out = self.conv3(out)  # torch.Size([100, 64, 16, 16])
         out = self.conv4(out)  # torch.Size([100, 128, 12, 12])
         out = out.view(out.size(0), -1)  # torch.Size([100, 18432])
-        out = self.fc1(out)  # torch.Size([100, 1])
+        out = F.sigmoid(self.fc1(out))  # torch.Size([100, 1])
         return out
 
 
