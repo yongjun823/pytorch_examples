@@ -38,6 +38,7 @@ class Discriminator(nn.Module):
         super().__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(1, 16, kernel_size=5),
+            nn.BatchNorm2d(16),
             nn.LeakyReLU(0.2)
         )
         self.conv2 = nn.Sequential(
@@ -60,17 +61,11 @@ class Discriminator(nn.Module):
 
     def forward(self, x):
         out = self.conv1(x)  # torch.Size([100, 16, 24, 24])
-        print(out.shape)
         out = self.conv2(out)  # torch.Size([100, 32, 20, 20])
-        print(out.shape)
         out = self.conv3(out)  # torch.Size([100, 64, 16, 16])
-        print(out.shape)
         out = self.conv4(out)  # torch.Size([100, 128, 12, 12])
-        print(out.shape)
         out = out.view(out.size(0), -1)  # torch.Size([100, 18432])
-        print(out.shape)
         out = self.fc1(out)  # torch.Size([100, 1])
-        print(out.shape)
         return out
 
 
@@ -78,35 +73,31 @@ class Generator(nn.Module):
     def __init__(self):
         super().__init__()
         self.conv1 = nn.Sequential(
-            nn.ConvTranspose2d(1, 16, kernel_size=4, padding=2),
+            nn.ConvTranspose2d(1, 16, kernel_size=4, stride=1),
             nn.BatchNorm2d(16),
             nn.LeakyReLU(0.2)
         )
         self.conv2 = nn.Sequential(
-            nn.ConvTranspose2d(16, 32, kernel_size=4, padding=2),
+            nn.ConvTranspose2d(16, 32, kernel_size=4, stride=1),
             nn.BatchNorm2d(32),
             nn.LeakyReLU(0.2)
         )
         self.conv3 = nn.Sequential(
-            nn.ConvTranspose2d(32, 64, kernel_size=4, padding=2),
+            nn.ConvTranspose2d(32, 64, kernel_size=4, stride=1),
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.2)
         )
         self.conv4 = nn.Sequential(
-            nn.ConvTranspose2d(64, 128, kernel_size=4, padding=2),
-            nn.BatchNorm2d(128),
+            nn.ConvTranspose2d(64, 1, kernel_size=2, stride=2, padding=5),
+            nn.BatchNorm2d(1),
             nn.Tanh()
         )
 
     def forward(self, x):
-        out = self.conv1(x)  # torch.Size([100, 16, 24, 24])
-        print(out.shape)
-        out = self.conv2(out)  # torch.Size([100, 32, 20, 20])
-        print(out.shape)
-        out = self.conv3(out)  # torch.Size([100, 64, 16, 16])
-        print(out.shape)
-        out = self.conv4(out)  # torch.Size([100, 128, 12, 12])
-        print(out.shape)
+        out = self.conv1(x)  # torch.Size([100, 16, 13, 13])
+        out = self.conv2(out)  # torch.Size([100, 32, 16, 16])
+        out = self.conv3(out)  # torch.Size([100, 64, 19, 19])
+        out = self.conv4(out)  # torch.Size([100, 1, 28, 28])
         return out
 
 
@@ -135,7 +126,7 @@ for epoch in range(100):
         d_real = D(img_var)
         D_real_loss = bce_loss(d_real, real_label)
 
-        z = to_var(torch.randn(batch_size, 1, 8, 8))
+        z = to_var(torch.randn(batch_size, 1, 10, 10))
         fake_img = G(z)
         d_fake = D(fake_img)
         D_fake_loss = bce_loss(d_fake, fake_label)
@@ -150,7 +141,7 @@ for epoch in range(100):
                   % (epoch, 100, i + 1, 600, d_real.data.mean()))
 
         # 생성기 학습
-        z = to_var(torch.randn(batch_size, 1, 8, 8))
+        z = to_var(torch.randn(batch_size, 1, 10, 10))
         fake_img = G(z)
         d_fake = D(fake_img)
         G_loss = bce_loss(d_fake, real_label)
