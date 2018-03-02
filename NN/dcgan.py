@@ -40,22 +40,22 @@ class Discriminator(nn.Module):
         self.conv1 = nn.Sequential(
             nn.Conv2d(1, 16, kernel_size=5),
             nn.BatchNorm2d(16),
-            nn.LeakyReLU(0.2)
+            nn.ReLU()
         )
         self.conv2 = nn.Sequential(
             nn.Conv2d(16, 32, kernel_size=5),
             nn.BatchNorm2d(32),
-            nn.LeakyReLU(0.2)
+            nn.ReLU()
         )
         self.conv3 = nn.Sequential(
             nn.Conv2d(32, 64, kernel_size=5),
             nn.BatchNorm2d(64),
-            nn.LeakyReLU(0.2)
+            nn.ReLU()
         )
         self.conv4 = nn.Sequential(
             nn.Conv2d(64, 128, kernel_size=5),
             nn.BatchNorm2d(128),
-            nn.LeakyReLU(0.2)
+            nn.ReLU()
         )
 
         self.fc1 = nn.Linear(12 * 12 * 128, 1)
@@ -76,17 +76,17 @@ class Generator(nn.Module):
         self.conv1 = nn.Sequential(
             nn.ConvTranspose2d(1, 16, kernel_size=4, stride=1),
             nn.BatchNorm2d(16),
-            nn.LeakyReLU(0.2)
+            nn.ReLU()
         )
         self.conv2 = nn.Sequential(
             nn.ConvTranspose2d(16, 32, kernel_size=4, stride=1),
             nn.BatchNorm2d(32),
-            nn.LeakyReLU(0.2)
+            nn.ReLU()
         )
         self.conv3 = nn.Sequential(
             nn.ConvTranspose2d(32, 64, kernel_size=4, stride=1),
             nn.BatchNorm2d(64),
-            nn.LeakyReLU(0.2)
+            nn.ReLU()
         )
         self.conv4 = nn.Sequential(
             nn.ConvTranspose2d(64, 1, kernel_size=2, stride=2, padding=5),
@@ -157,4 +157,4 @@ for epoch in range(100):
                   % (epoch, 100, i + 1, 600, d_fake.data.mean()))
 
     fake_images = fake_img.view(fake_img.size(0), 1, 28, 28)
-    save_image(denorm(fake_images.data), './fake_images-%d.png' % (epoch + 1))
+    save_image(denorm(fake_images.data), './dc-fake_images-%d.png' % (epoch + 1))
